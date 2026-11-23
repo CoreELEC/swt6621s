@@ -562,9 +562,9 @@ void skw_recovery_deinit(struct skw_core *skw)
 	int i, j;
 	struct skw_recovery_data *rd = &skw->recovery_data;
 
-	mutex_lock(&rd->lock);
-
 	cancel_work_sync(&skw->recovery_work);
+
+	mutex_lock(&rd->lock);
 
 	for (i = 0; i < SKW_NR_IFACE; i++)
 		SKW_KFREE(rd->iface[i].param);
