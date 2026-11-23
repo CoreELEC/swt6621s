@@ -390,14 +390,21 @@ int skw_queue_event_work(struct wiphy *wiphy, struct skw_event_work *work,
 			 struct sk_buff *skb)
 {
 	struct skw_core *skw = wiphy_priv(wiphy);
+	unsigned long flags;
 
-	if (!atomic_read(&work->enabled))
+	/* serialize with skw_event_work_disable, no event is queued after it */
+	spin_lock_irqsave(&work->qlist.lock, flags);
+	if (!atomic_read(&work->enabled)) {
+		spin_unlock_irqrestore(&work->qlist.lock, flags);
 		return -EINVAL;
+	}
 
-	skb_queue_tail(&work->qlist, skb);
+	__skb_queue_tail(&work->qlist, skb);
 
 	if (!work_pending(&work->work))
 		queue_work(skw->event_wq, &work->work);
+
+	spin_unlock_irqrestore(&work->qlist.lock, flags);
 
 	return 0;
 }

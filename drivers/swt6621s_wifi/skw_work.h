@@ -74,9 +74,18 @@ static inline void skw_event_work_init(struct skw_event_work *work,
 	atomic_set(&work->enabled, 1);
 }
 
+static inline void skw_event_work_disable(struct skw_event_work *work)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&work->qlist.lock, flags);
+	atomic_set(&work->enabled, 0);
+	spin_unlock_irqrestore(&work->qlist.lock, flags);
+}
+
 static inline void skw_event_work_deinit(struct skw_event_work *work)
 {
-	atomic_set(&work->enabled, 0);
+	skw_event_work_disable(work);
 	cancel_work_sync(&work->work);
 	skb_queue_purge(&work->qlist);
 }
