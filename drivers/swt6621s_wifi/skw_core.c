@@ -877,7 +877,13 @@ static int skw_android_cmd(struct net_device *dev, void __user *priv_data)
 
 	if (IS_SKW_CMD(command, COUNTRY)) {
 		data = SKW_CMD_DATA(command, COUNTRY);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+		wiphy_lock(dev->ieee80211_ptr->wiphy);
+#endif
 		ret = skw_set_regdom(dev->ieee80211_ptr->wiphy, data);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+		wiphy_unlock(dev->ieee80211_ptr->wiphy);
+#endif
 		if (ret)
 			skw_chip_err(skw->idx, "skw_set_regdom failed, ret: %d\n", ret);
 	} else if (IS_SKW_CMD(command, BTCOEXSCAN_STOP)) {
@@ -924,7 +930,13 @@ static int skw_ioctl(struct net_device *dev, void __user *user_data)
 		if (strlen(country) != 2)
 			return -EINVAL;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+		wiphy_lock(dev->ieee80211_ptr->wiphy);
+#endif
 		ret = skw_set_regdom(dev->ieee80211_ptr->wiphy, country);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+		wiphy_unlock(dev->ieee80211_ptr->wiphy);
+#endif
 		if (ret)
 			skw_chip_err(skw->idx, "set regdom failed, ret: %d\n", ret);
 
@@ -2242,6 +2254,9 @@ static int skw_add_default_iface(struct wiphy *wiphy)
 	struct skw_core *skw = wiphy_priv(wiphy);
 
 	rtnl_lock();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_lock(wiphy);
+#endif
 
 	iface = skw_add_iface(wiphy, "wlan%d", NL80211_IFTYPE_STATION,
 				skw_mac, SKW_INVALID_ID, true);
@@ -2275,6 +2290,9 @@ static int skw_add_default_iface(struct wiphy *wiphy)
 #endif
 
 unlock:
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_unlock(wiphy);
+#endif
 	rtnl_unlock();
 
 	return ret;
@@ -2406,6 +2424,9 @@ static int skw_drv_probe(struct platform_device *pdev)
 	skw_init_mib(wiphy);
 
 	rtnl_lock();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_lock(wiphy);
+#endif
 
 	skw_set_wiphy_regd(wiphy, skw->country);
 
@@ -2413,6 +2434,9 @@ static int skw_drv_probe(struct platform_device *pdev)
 	    skw->config->regd.country[1] != '0')
 		skw_set_regdom(wiphy, skw->config->regd.country);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_unlock(wiphy);
+#endif
 	rtnl_unlock();
 
 	ret = skw_add_default_iface(wiphy);
@@ -2477,9 +2501,16 @@ static int skw_drv_remove(struct platform_device *pdev)
 	cfg80211_shutdown_all_interfaces(wiphy);
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_lock(wiphy);
+#endif
+
 	for (i = 0; i < SKW_NR_IFACE; i++)
 		skw_del_iface(wiphy, skw->vif.iface[i]);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_unlock(wiphy);
+#endif
 	rtnl_unlock();
 
 	wiphy_unregister(wiphy);

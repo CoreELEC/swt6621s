@@ -93,7 +93,11 @@ static int skw_recovery_sta(struct wiphy *wiphy, struct skw_recovery_data *rd,
 
 		if (ether_addr_equal(peer->addr, core->bss.bssid)) {
 			del_timer_sync(&core->timer);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+			wiphy_work_cancel(wiphy, &iface->sta.work);
+#else
 			cancel_work_sync(&iface->sta.work);
+#endif
 
 			ret = skw_cmd_unjoin(wiphy, dev, peer->addr,
 					SKW_LEAVE, true);
@@ -341,6 +345,9 @@ static int skw_recovery_iface(struct work_struct *wk, u8 iface_idx)
 	skw->vif.opened_dev++;
 	spin_unlock_bh(&skw->vif.lock);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_lock(wiphy);
+#endif
 	mutex_lock(&rd->lock);
 
 	switch (iface->wdev.iftype) {
@@ -374,6 +381,9 @@ static int skw_recovery_iface(struct work_struct *wk, u8 iface_idx)
 	}
 
 	mutex_unlock(&rd->lock);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_unlock(wiphy);
+#endif
 
 ret:
 	return ret;
@@ -432,6 +442,9 @@ static void skw_recovery_work(struct work_struct *wk)
 	skw_init_mib(wiphy);
 
 	rtnl_lock();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_lock(wiphy);
+#endif
 
 	skw_set_wiphy_regd(wiphy, skw->country);
 
@@ -439,6 +452,9 @@ static void skw_recovery_work(struct work_struct *wk)
 	    skw->config->regd.country[1] != '0')
 		skw_set_regdom(wiphy, skw->country);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	wiphy_unlock(wiphy);
+#endif
 	rtnl_unlock();
 
 	for (i = 0; i < SKW_NR_IFACE; i++) {

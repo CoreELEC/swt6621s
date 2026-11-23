@@ -50,7 +50,12 @@ struct skw_work_cb {
 
 struct skw_event_work {
 	atomic_t enabled;
-	struct work_struct work;
+	union {
+		struct work_struct work;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+		struct wiphy_work wiphy_work;
+#endif
+	};
 	struct sk_buff_head qlist;
 };
 

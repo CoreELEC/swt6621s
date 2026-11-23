@@ -404,8 +404,16 @@ int skw_queue_event_work(struct wiphy *wiphy, struct skw_event_work *work,
 
 	__skb_queue_tail(&work->qlist, skb);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	/* interface events run under the wiphy mutex like cfg80211 calls */
+	if (work != &skw->event_work)
+		wiphy_work_queue(wiphy, &work->wiphy_work);
+	else if (!work_pending(&work->work))
+		queue_work(skw->event_wq, &work->work);
+#else
 	if (!work_pending(&work->work))
 		queue_work(skw->event_wq, &work->work);
+#endif
 
 	spin_unlock_irqrestore(&work->qlist.lock, flags);
 
