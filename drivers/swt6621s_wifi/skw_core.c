@@ -2490,9 +2490,9 @@ static int skw_drv_remove(struct platform_device *pdev)
 
 	skw_work_deinit(wiphy);
 
-	wiphy_free(wiphy);
-
 	skw_dec_chip_idx(skw->idx);
+
+	wiphy_free(wiphy);
 
 	return 0;
 }
