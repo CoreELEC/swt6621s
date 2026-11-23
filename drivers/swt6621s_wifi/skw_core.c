@@ -2453,8 +2453,6 @@ static int skw_drv_remove(struct platform_device *pdev)
 	struct wiphy *wiphy;
 	struct skw_core *skw = platform_get_drvdata(pdev);
 
-	skw_chip_info(skw->idx, "%s\n", pdev->name);
-
 	if (!skw)
 		return 0;
 
