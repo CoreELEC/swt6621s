@@ -15,7 +15,7 @@ skw_wifi: skw_bsp
 
 skw_bsp:
 	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_SRC) M=$(M)/drivers/seekwaveplatform_lite modules \
-                CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=y CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m \
+                CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=y CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m CONFIG_SKW_BT=m \
                 skw_extra_flags="-I$(SKW_EXTRA_INC)" \
                 skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
 
