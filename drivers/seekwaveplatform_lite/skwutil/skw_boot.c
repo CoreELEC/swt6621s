@@ -293,11 +293,11 @@ static int seekwave_boot_parse_dt(struct platform_device *pdev, struct seekwave_
 			of_get_named_gpio_flags(np, "gpio_chip_en", 0, &flags);
 #elif (KERNEL_VERSION(6, 3, 0) <= LINUX_VERSION_CODE)
 		boot_data->host_gpio =
-			of_get_named_gpio_flags(np, "gpio_host_wake", 0);
+			of_get_named_gpio(np, "gpio_host_wake", 0);
 		boot_data->chip_gpio =
-			of_get_named_gpio_flags(np, "gpio_chip_wake", 0);
+			of_get_named_gpio(np, "gpio_chip_wake", 0);
 		g_chipen_pin = boot_data->chip_en =
-			of_get_named_gpio_flags(np, "gpio_chip_en", 0);
+			of_get_named_gpio(np, "gpio_chip_en", 0);
 #endif
 	}
 	boot_data->dma_type = skw_use_sdma?SDMA:ADMA;
@@ -547,7 +547,11 @@ static int seekwave_boot_probe(struct  platform_device *pdev)
  *Date:
  *Modify:
  **************************************************************************/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
+static void seekwave_boot_remove(struct  platform_device *pdev)
+#else
 static int seekwave_boot_remove(struct  platform_device *pdev)
+#endif
 {
 	skwboot_log("%s the Enter \n", __func__);
 
@@ -591,7 +595,9 @@ static int seekwave_boot_remove(struct  platform_device *pdev)
 		skwboot_err("%s:boot_data is NULL\n", __func__);
 	}
 	mutex_destroy(&boot_mutex);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
 	return 0;
+#endif
 }
 extern void skw_modem_log_stop_rec(void);
 static void seekwave_boot_shutdown(struct platform_device *pdev)
