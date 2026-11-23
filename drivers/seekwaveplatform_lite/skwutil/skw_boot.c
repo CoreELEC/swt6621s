@@ -1034,7 +1034,7 @@ static int skw_dloader_module(int service_index)
  *Date:
  *Modify:
  **************************************************************************/
-int skw_start_wifi_service(void)
+int swt6621s_start_wifi_service(void)
 {
 	int ret =0;
 
@@ -1062,7 +1062,7 @@ int skw_start_wifi_service(void)
 	skwboot_log("%s wifi boot sucessfull\n", __func__);
 	return 0;
 }
-EXPORT_SYMBOL_GPL(skw_start_wifi_service);
+EXPORT_SYMBOL_GPL(swt6621s_start_wifi_service);
 /***************************************************************************
  *Description:
  *Seekwave tech LTD
@@ -1070,7 +1070,7 @@ EXPORT_SYMBOL_GPL(skw_start_wifi_service);
  *Date:
  *Modify:
  **************************************************************************/
-int skw_stop_wifi_service(void)
+int swt6621s_stop_wifi_service(void)
 {
 	int ret =0;
 	skwboot_log("%s Enter cp_state =%d \n",__func__, cp_exception_sts);
@@ -1101,7 +1101,7 @@ int skw_stop_wifi_service(void)
 	skwboot_log("seekwave boot stop done:%s\n",__func__);
 	return 0;
 }
-EXPORT_SYMBOL_GPL(skw_stop_wifi_service);
+EXPORT_SYMBOL_GPL(swt6621s_stop_wifi_service);
 /***************************************************************************
  *Description:
  *Seekwave tech LTD
@@ -1206,8 +1206,8 @@ static int skw_first_boot(struct seekwave_device *boot_data)
 	boot_data->gpio_in  = boot_data->host_gpio;
 	boot_data->dma_type_addr = SKW_SDIO_PLD_DMA_TYPE;
 	boot_data->slp_disable_addr = SKW_SDIO_CP_SLP_SWITCH;
-	boot_data->wifi_start = skw_start_wifi_service;
-	boot_data->wifi_stop = skw_stop_wifi_service;
+	boot_data->wifi_start = swt6621s_start_wifi_service;
+	boot_data->wifi_stop = swt6621s_stop_wifi_service;
 	boot_data->bt_start = skw_start_bt_service;
 	boot_data->bt_stop = skw_stop_bt_service;
 	boot_data->skw_dloader_module = skw_dloader_module;
