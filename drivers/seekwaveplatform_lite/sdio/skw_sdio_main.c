@@ -82,8 +82,6 @@ static int skw_sdio_reg_reset_cp(void);
 extern int  cp_detect_sleep_mode;
 extern void sdio_reinit(void);
 extern void extern_wifi_set_enable(int is_on);
-extern void set_power_control_lock(int lock);
-extern void set_sdio_control_lock(int lock);
 extern char skw_cp_ver;
 extern int max_ch_num;
 extern int max_pac_size;
@@ -2689,8 +2687,6 @@ static int __init skw_sdio_io_init(void)
 	extern_wifi_set_enable(1);
 	msleep(200);
 	sdio_reinit();
-	set_power_control_lock(1);
-	set_sdio_control_lock(1);
 
 	skw_sdio = kzalloc(sizeof(struct skw_sdio_data_t), GFP_KERNEL);
 	if (!skw_sdio) {
