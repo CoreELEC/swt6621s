@@ -17,6 +17,9 @@
 
 #include <linux/skbuff.h>
 #include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 10, 0)
+#include <net/rps.h>
+#endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
 #include <net/netdev_rx_queue.h>

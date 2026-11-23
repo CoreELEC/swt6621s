@@ -369,7 +369,7 @@ static int skw_config_intf(struct skw_cfg_intf *intf, char *value)
 				break;
 			}
 
-			strlcpy(ifa->name, buff, IFNAMSIZ);
+			strscpy(ifa->name, buff, IFNAMSIZ);
 
 			break;
 

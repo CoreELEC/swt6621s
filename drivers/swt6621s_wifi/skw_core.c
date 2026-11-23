@@ -2447,14 +2447,22 @@ failed:
 	return ret;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
+static void skw_drv_remove(struct platform_device *pdev)
+#else
 static int skw_drv_remove(struct platform_device *pdev)
+#endif
 {
 	int i;
 	struct wiphy *wiphy;
 	struct skw_core *skw = platform_get_drvdata(pdev);
 
 	if (!skw)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
+		return;
+#else
 		return 0;
+#endif
 
 	wiphy = priv_to_wiphy(skw);
 
@@ -2492,7 +2500,9 @@ static int skw_drv_remove(struct platform_device *pdev)
 
 	wiphy_free(wiphy);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
 	return 0;
+#endif
 }
 
 static struct platform_driver skw_drv = {

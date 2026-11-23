@@ -371,7 +371,11 @@ static inline void skw_compat_rx_assoc_resp(struct net_device *dev,
 			int uapsd, const u8 *req_ies, size_t req_ies_len)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 74)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	struct cfg80211_rx_assoc_resp_data assoc_resp = {
+#else
 	struct cfg80211_rx_assoc_resp assoc_resp = {
+#endif
 		.buf = buf,
 		.len = len,
 		.req_ies = req_ies,
@@ -465,7 +469,9 @@ static inline void skw_compat_cfg80211_roamed(struct net_device *dev,
 static inline void skw_ch_switch_started_notify(struct net_device *dev,
 		struct cfg80211_chan_def *chandef, u8 count,  bool quiet)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 74)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
+	cfg80211_ch_switch_started_notify(dev, chandef, 0, count, quiet);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 74)
 	cfg80211_ch_switch_started_notify(dev, chandef, 0, count, quiet, 0);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 35)
 	cfg80211_ch_switch_started_notify(dev, chandef, count, quiet);
@@ -478,7 +484,9 @@ static inline void skw_ch_switch_started_notify(struct net_device *dev,
 static inline void skw_ch_switch_notify(struct net_device *dev,
 		struct cfg80211_chan_def *chandef)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 74)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
+	cfg80211_ch_switch_notify(dev, chandef, 0);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 74)
 	cfg80211_ch_switch_notify(dev, chandef, 0, 0);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 41)
 	cfg80211_ch_switch_notify(dev, chandef, 0);
@@ -493,7 +501,11 @@ static inline void skw_compat_rx_assoc_resp(struct net_device *dev,
 			int uapsd, const u8 *req_ies, size_t req_ies_len)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	struct cfg80211_rx_assoc_resp_data assoc_resp = {
+#else
 	struct cfg80211_rx_assoc_resp assoc_resp = {
+#endif
 		.buf = buf,
 		.len = len,
 		.req_ies = req_ies,

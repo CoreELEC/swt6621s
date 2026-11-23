@@ -1776,14 +1776,22 @@ static int skw_stop_ap(struct wiphy *wiphy, struct net_device *dev,
 	return 0;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+static int skw_change_beacon(struct wiphy *wiphy, struct net_device *dev,
+				struct cfg80211_ap_update *info)
+#else
 static int skw_change_beacon(struct wiphy *wiphy, struct net_device *dev,
 				struct cfg80211_beacon_data *bcn)
+#endif
 {
 	int ret = -1;
 	int total, fixed, offset = 0;
 	struct skw_iface *iface = netdev_priv(dev);
 	struct skw_beacon_params *param = NULL;
 	struct skw_core *skw = wiphy_priv(wiphy);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+	struct cfg80211_beacon_data *bcn = &info->beacon;
+#endif
 
 	skw_chip_dbg(skw->idx, "dev: %s\n", netdev_name(dev));
 	if (!bcn)
@@ -5580,7 +5588,14 @@ static int skw_start_radar_detection(struct wiphy *wiphy, struct net_device *dev
 	return ret;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+static int skw_cfg80211_start_radar_detection(struct wiphy *wiphy,
+			struct net_device *dev,
+			struct cfg80211_chan_def *chandef, u32 cac_time_ms, int link_id)
+{
+	return skw_start_radar_detection(wiphy, dev, chandef, cac_time_ms);
+}
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)
 static int skw_cfg80211_start_radar_detection(struct wiphy *wiphy,
 			struct net_device *dev,
 			struct cfg80211_chan_def *chandef, u32 cac_time_ms)
